@@ -26,34 +26,53 @@ class NewspaperLayout extends Plugin {
       },
     });
 
-    editor.ui.componentFactory.add( 'insertLayout', locale => {
+    const createTableLayout = (totalColumns) => {
+      const model = this.editor.model;
+      const selection = model.document.selection;
+      const tableUtils = this.editor.plugins.get( 'TableUtils' );
+
+      const rows = 1;
+
+      const insertPosition = findOptimalInsertionPosition( selection, model );
+      model.change( writer => {
+        const table = tableUtils.createTable( writer, rows, totalColumns );
+        writer.setAttribute('type', 'column-layout', table);
+
+        model.insertContent( table, insertPosition );
+
+        writer.setSelection( writer.createPositionAt( table.getNodeByPath( [ 0, 0, 0 ] ), 0 ) );
+      });
+    }
+
+    editor.ui.componentFactory.add( 'insertLayout2', locale => {
       const view = new ButtonView( locale );
 
       view.set( {
-          label: 'Insert Layout',
+          label: 'Insert 2 Column Layout',
           icon: LayoutIcon,
           tooltip: true
       } );
 
       // Callback executed once the image is clicked.
       view.on( 'execute', () => {
-        const model = this.editor.model;
-        const selection = model.document.selection;
-        const tableUtils = this.editor.plugins.get( 'TableUtils' );
+        createTableLayout(2);
+      });
 
-        const rows = 1;
-        const columns = 2;
+      return view;
+    });
 
-        const insertPosition = findOptimalInsertionPosition( selection, model );
+    editor.ui.componentFactory.add( 'insertLayout3', locale => {
+      const view = new ButtonView( locale );
 
-        model.change( writer => {
-          const table = tableUtils.createTable( writer, rows, columns );
-          writer.setAttribute('type', 'column-layout', table);
+      view.set( {
+          label: 'Insert 3 Column Layout',
+          icon: LayoutIcon,
+          tooltip: true
+      } );
 
-          model.insertContent( table, insertPosition );
-
-          writer.setSelection( writer.createPositionAt( table.getNodeByPath( [ 0, 0, 0 ] ), 0 ) );
-        } );
+      // Callback executed once the image is clicked.
+      view.on( 'execute', () => {
+        createTableLayout(3);
       });
 
       return view;
